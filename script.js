@@ -74,9 +74,6 @@ function changeProgressPercent(percent) {
    let progressBar = document.querySelector(".progress-bar");
    progressBar.style.width = percent + "%";
 }
-
-
-
 function changeDisplayText(text) {
   if (text.length > 23) {
     text = text.slice(0,23) + "...";
@@ -84,6 +81,114 @@ function changeDisplayText(text) {
   let displayText = document.querySelector(".display span");
 displayText.innerHTML = text;
   }
+  
+  //-----------drag'n drop---------
+  
+  let money = document.querySelectorAll(".money img");
+  
+  /*for (let i= 0; i < money.length; i++) {
+    money[i].onmousedown = takeMoney;
+  }*/  //1 вариант
+  //div class="coffee-item" onclick='cookcoffee('Капучино' 92, this)"></div>
+  /*coffeeItem.onclick = function() {
+    cookCoffee('Капучино', 92, this);
+  }*/
+  // в функции,которая присвоена событию ,передается this ,который возвращает элемент,на котором это событие совершено.
+  
+  //2 вариант
+  for (let bill of money) {
+    bill.onmousedown = takeMoney;
+  }
+  //в функцию,которой присвоено событие,первым параметром передается объект события -event ,е 
+  function takeMoney(event) {
+    event.preventDefault();//событие прервано.Если использовать функцию обертку,то  1 параметром будет  использовано event 
+   /* console.log(this);
+    console.log(event);
+    console.log([event.target, event.clientX, event.clientY]);*/
+    let bill = this;
+    
+    console.log(bill.style.height);
+    console.log(bill.style.width);
+    console.log(bill.getBoundingClientRect() );
+    
+    let billCoords = bill.getBoundingClientRect();
+    
+    let billHeight = billCoords.height;
+    let billWidth = billCoords.width;
+    
+    bill.style.position = "absolute";
+    if (!bill.style.transform) { //bil.style.transform == "" ("" = false);
+    bill.style.top = (event.clientY - billHeight/2) + "px";
+    bill.style.left = (event.clientX - billWidth/2) + "px";
+    bill.style.transform = "rotate(90deg)";
+    } else { 
+    bill.style.top = (event.clientY - billWidth/2) + "px";
+    bill.style.left = (event.clientX - billHeight/2) + "px";
+    }
+    bill.style.transition = "transform .3s";
+    
+    window.onmousemove = function(event) { 
+    let billCoords = bill.getBoundingClientRect();
+    let billHeight = billCoords.height;
+    let billWidth = billCoords.width;
+    bill.style.top = (event.clientY - billWidth/2) + "px";
+    bill.style.left = (event.clientX - billHeight/2) + "px";
+    }
+    
+    bill.onmouseup = function() {
+      window.onmousemove = null;
+     if ( inAtm(bill) ) {
+      console.log(bill.getAttribute("data-cost") );
+      console.log(bill.dataset.cost);
+      balance.value = +balance.value + +bill.dataset.cost;
+      bill.remove(); //удаляем элемент
+     }
+    }
+  }
+  
+  function inAtm(bill) {
+    let atm = document.querySelector(".atm img");
+    
+    let atmCoords = atm.getBoundingClientRect();
+    let atmLeftX = atmCoords.x;
+    let atmRightX = atmCoords.x + atmCoords.width;
+    let atmTopY = atmCoords.y;
+    let atmBottomY = atmCoords.y + atmCoords.height/3;
+    
+    let billCoords = bill.getBoundingClientRect() ;
+    let billLeftX = billCoords.x;
+    let billRightX = billCoords.x + billCoords.width;
+    let billY = billCoords.y;
+    if (
+      billLeftX > atmLeftX
+      && billRightX < atmRightX
+      && billY > atmTopY
+      && billY < atmBottomY
+    ) {
+      return true;
+    } else {
+       return false; 
+      }
+
+    /*return { 
+    atm: [atmLeftX, atmRightX, atmTopY, atmBottomY],
+    bill: [billLeftX, billRightX, billY],
+  };*/
+  }
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
   
   
   
