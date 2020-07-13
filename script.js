@@ -65,7 +65,7 @@ function takeCoffee() {
   state = "waiting";
  changeProgressPercent(0);
  cup.style.opacity = 0;
- cup.style.display =""; // илии "none"
+ cup.style.display =""; // или "none"
  cup.style.cursor ="";
  changeDisplayText("выберите кофе");
  cup.onclick = null;
@@ -138,10 +138,22 @@ displayText.innerHTML = text;
     bill.onmouseup = function() {
       window.onmousemove = null;
      if ( inAtm(bill) ) {
+       let cashContainer = document.querySelector(".cash-container");
+       bill.style.position = "";
+       bill.style.transform = "rotate(90deg) translateX(25%)";
+       cashContainer.append(bill);//присоединить в конец элемента
+       bill.style.transition = "transform 1.5s";
+       setTimeout(()  => {
+       bill.style.transform = "rotate(90deg) translateX(-75%)";
+       bill.ontransitionend = () => {
+         balance.value = +balance.value + +bill.dataset.cost;
+         bill.remove();//удаляем элемент
+       }
+       }, 10)
       console.log(bill.getAttribute("data-cost") );
       console.log(bill.dataset.cost);
-      balance.value = +balance.value + +bill.dataset.cost;
-      bill.remove(); //удаляем элемент
+      /*balance.value = +balance.value + +bill.dataset.cost;
+      bill.remove(); //удаляем элемент*/
      }
     }
   }
@@ -175,6 +187,87 @@ displayText.innerHTML = text;
     bill: [billLeftX, billRightX, billY],
   };*/
   }
+  // получение сдачи , создание элементов с использованием JS
+  let changeButton = document.querySelector(".change-button");
+  changeButton.onclick = takeChange;
+  
+  function takeChange() {
+    if (+balance.value >= 10) {//это называется рекурсивная функция
+      createCoin("10");
+      balance.value -= 10;
+     //либо  takeChange(); return;
+      return setTimeout (takeChange, 300);
+    } else if (+balance.value >= 5) {
+      createCoin("5");
+      balance.value -= 5;
+      return setTimeout (takeChange, 300);
+    } else if (+balance.value >= 2) {
+      createCoin("2");
+      balance.value -= 2;
+     return setTimeout (takeChange, 300);
+    } else if (+balance.value >= 1) {
+      createCoin("1");
+      balance.value -= 1;
+      return setTimeout (takeChange, 300);
+   }
+  }
+  function createCoin(cost) {
+    let coinSrc = "";
+    switch (cost) {
+      case "10":
+       coinSrc = "img/10rub.png";
+        break;
+        case "5":
+       coinSrc = "img/5rub.png";
+        break;
+        case "2":
+         coinSrc = "img/2rub.png";
+          break;
+          case "1":
+         coinSrc = "img/1rub.png";
+        break;
+      default:
+      console.error("такой монеты не существует");
+    }
+    //заменяем эту конструкцию выше написанной
+    /*if (cost == "10") {
+     } else if (cost == "5") {
+        } else if (cost == "2") {
+         } else if (cost == "1") {
+          }  else {
+          } */
+   //let coinSrc = "img/10rub.png";
+   let changeBox = document.querySelector(".change-box");
+   let changeBoxWidth = changeBox.getBoundingClientRect().width;
+   let changeBoxHeight = changeBox.getBoundingClientRect().height;
+   let coin = document.createElement("img");
+   coin.setAttribute("src", coinSrc);
+   coin.style.width = "50px";
+   coin.style.cursor ="pointer";
+   coin.style.position = "absolute";
+   coin.style.top = Math.floor(Math.random() * (changeBoxHeight - 50)) + "px";
+   coin.style.left = Math.floor(Math.random() * (changeBoxWidth - 50)) + "px";
+   changeBox.append(coin);//Добавляем элемент в конец родительскогородительского
+   //changeBox.prepend(coin);//Добавляем элемент в начало родительского
+   //changeBox.after(coin);//Добавляем элемент после родительского
+   //changeBox.before(coin);//Добавляем элемент до родительского
+   //changeBox.replaceWith(coin);//Заменяет родительский элемент  
+   coin.style.transition = "transform .5s, opacity .5s";
+   coin.style.transform = "translateY(-20%)";
+   coin.style.opacity = 0;
+    setTimeout(() => {
+      coin.style.transform = "translateY(0%)";
+      coin.style.opacity = 1;
+    },10)
+    coin.onclick = () => {
+      coin.style.transform = "translateY(-20%)";// или coin.remove(???)
+      coin.style.opacity = 0;
+      coin.ontransitionend = () => {
+        coin.remove();
+      }
+    }
+  }
+   
   
   
   
